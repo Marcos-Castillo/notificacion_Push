@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ejemplo de Notificaciones Push</title>
+  <script>
+    function solicitarPermiso() {
+      if ('Notification' in window) {
+        Notification.requestPermission().then(function(permission) {
+          if (permission === 'granted') {
+            console.log('Permiso concedido para mostrar notificaciones');
+          }
+        });
+      } else {
+        console.log('Las notificaciones no son compatibles en este navegador.');
+      }
+    }
+
+    function mostrarNotificacion() {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        setTimeout(function() {
+          var options = {
+            body: '¡Hola! Esta es una notificación de ejemplo.',
+            icon: 'icono.png'
+          };
+          var notification = new Notification('Título de la notificación', options);
+        }, 5000); // Mostrar la notificación después de 5 segundos (5000 ms)
+      } else {
+        console.log('No tienes permiso para mostrar notificaciones.');
+      }
+    }
+  </script>
+</head>
+<body>
+  <h1>Ejemplo de Notificaciones Push</h1>
+  <button onclick="solicitarPermiso()">Solicitar Permiso</button>
+  <button onclick="mostrarNotificacion()">Mostrar Notificación</button>
+</body>
+</html>
