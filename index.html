@@ -23,8 +23,9 @@
             body: '¡Hola! Esta es una notificación de ejemplo.',
             icon: 'icono.png'
           };
-          var notification = new Notification('Título de la notificación', options);
-        }, 1000); // Mostrar la notificación después de 5 segundos (5000 ms)
+          console.log('dentro de la notificacion');
+          var notification = new Notification('Título de la notificación');//options
+        }, 5000); // Mostrar la notificación después de 5 segundos (5000 ms)
       } else {
         console.log('No tienes permiso para mostrar notificaciones.');
       }
