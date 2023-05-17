@@ -16,6 +16,7 @@
     }
 
     function mostrarNotificacion() {
+      console.log('funcion notificacion')
       if ('Notification' in window && Notification.permission === 'granted') {
         setTimeout(function() {
           var options = {
@@ -23,7 +24,7 @@
             icon: 'icono.png'
           };
           var notification = new Notification('Título de la notificación', options);
-        }, 5000); // Mostrar la notificación después de 5 segundos (5000 ms)
+        }, 1000); // Mostrar la notificación después de 5 segundos (5000 ms)
       } else {
         console.log('No tienes permiso para mostrar notificaciones.');
       }
