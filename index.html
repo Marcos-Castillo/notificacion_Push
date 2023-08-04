@@ -24,6 +24,7 @@ limitations under the License.
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
 
     <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
@@ -96,7 +97,7 @@ limitations under the License.
     <div id="cards">
       <paper-card heading="">
         <div class="card-content">
-          <img src="/bower_components/logo.png" alt="Grupo Dinosaurio" width="100%">
+          <img src="./bower_components/logo.png" alt="Grupo Dinosaurio" width="100%">
           <paper-progress id="progress" indeterminate></paper-progress>
         </div>
       </paper-card>
@@ -136,7 +137,7 @@ limitations under the License.
           return;
         }
 
-        const url = `http://192.169.1.10:88/Precios/${ean}`;
+        const url = `https://192.169.1.10:88/Precios/${ean}`;
          await fetch(url)
           .then((response) => response.text())
           .then((base64Image) => {
