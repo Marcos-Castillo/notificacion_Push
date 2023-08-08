@@ -9,7 +9,7 @@
     <script>
         document.getElementById('imprimirBtn').addEventListener('click', async () => {
             try {
-              const serviceUUID = '00001234-0000-1000-8000-00805f9b34fb'; // Reemplaza con el UUID correcto
+              const serviceUUID = '000018f0-0000-1000-8000-00805f9b34fb'; // Reemplaza con el UUID correcto
         const device = await navigator.bluetooth.requestDevice({ filters: [{ services: [serviceUUID] }] });
                 const server = await device.gatt.connect();
                 const service = await server.getPrimaryService('printer');
@@ -20,7 +20,31 @@
                 const dataToSend = convertirBase64AFormatoImprimible(base64Image);
 
                 // Envío de los datos a la impresora
-                await characteristic.writeValue(new Uint8Array(dataToSend));
+
+                let printData = new Uint8Array(dataToSend);
+          let offset = 0;
+          // Set the header bytes for printing the image
+          printData[0] = 29;  // Print raster bitmap
+          printData[1] = 118; // Print raster bitmap
+          printData[2] = 48; // Print raster bitmap
+          printData[3] = 0;  // Normal 203.2 DPI
+          printData[4] = canvas.width / 8; // Number of horizontal data bits (LSB)
+          printData[5] = 0; // Number of horizontal data bits (MSB)
+          printData[6] = canvas.height % 256; // Number of vertical data bits (LSB)
+          printData[7] = canvas.height / 256;  // Number of vertical data bits (MSB)
+          offset = 7;
+          // Loop through image rows in bytes
+          for (let i = 0; i < canvas.height; ++i) {
+            for (let k = 0; k < canvas.width / 8; ++k) {
+              let k8 = k * 8;
+              //  Pixel to bit position mapping
+              printData[++offset] = getDarkPixel(k8 + 0, i) * 128 + getDarkPixel(k8 + 1, i) * 64 +
+                          getDarkPixel(k8 + 2, i) * 32 + getDarkPixel(k8 + 3, i) * 16 +
+                          getDarkPixel(k8 + 4, i) * 8 + getDarkPixel(k8 + 5, i) * 4 +
+                          getDarkPixel(k8 + 6, i) * 2 + getDarkPixel(k8 + 7, i);
+            }
+          }
+                await characteristic.writeValue(new Uint8Array(printData));
 
                 console.log('Imagen enviada a imprimir exitosamente.');
             } catch (error) {
