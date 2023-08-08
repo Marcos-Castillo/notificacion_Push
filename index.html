@@ -309,10 +309,10 @@ limitations under the License.
 //prueba
       async function connectToBluetoothPrinter() {
   try {
-    const device = await navigator.bluetooth.requestDevice({ filters: [{ services: ['printer'] }] });
+    const device = await navigator.bluetooth.requestDevice({ filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }] });
     const server = await device.gatt.connect();
-    const service = await server.getPrimaryService('printer');
-    const characteristic = await service.getCharacteristic('print_data');
+    const service = await server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb");
+    const characteristic = await service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb");
     
     // Enviar datos a la impresora (depende del protocolo y formato necesario)
     await characteristic.writeValue("prueba");
