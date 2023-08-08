@@ -114,7 +114,7 @@ limitations under the License.
           <paper-textarea id="message" label="Enter ean"></paper-textarea>
         </div>
       </paper-card>
-      
+      <button onclick="connectToBluetoothPrinter()">prueba</button>
 
       <paper-card>
         <div class="card-content">
@@ -138,7 +138,7 @@ limitations under the License.
           return;
         }
 
-        const url = `https://www.dinosauriorrhh.com.ar/apireporteprecios/precios/${ean}`;
+        const url = `http://www.dinosauriorrhh.com.ar/apireporteprecios/precios/${ean}`;
           fetch(url)
           .then((response) => response.text())
           .then((base64Image) => {
@@ -306,6 +306,26 @@ limitations under the License.
           }
         });
       });
+//prueba
+      async function connectToBluetoothPrinter() {
+  try {
+    const device = await navigator.bluetooth.requestDevice({ filters: [{ services: ['printer'] }] });
+    const server = await device.gatt.connect();
+    const service = await server.getPrimaryService('printer');
+    const characteristic = await service.getCharacteristic('print_data');
+    
+    // Enviar datos a la impresora (depende del protocolo y formato necesario)
+    await characteristic.writeValue("prueba");
+    
+    console.log('Datos enviados a la impresora exitosamente.');
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+// prueba
+
+
     </script>
   </body>
 </html>
