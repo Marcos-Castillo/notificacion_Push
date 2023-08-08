@@ -114,7 +114,6 @@ limitations under the License.
           <paper-textarea id="message" label="Enter ean"></paper-textarea>
         </div>
       </paper-card>
-      <button onclick="connectToBluetoothPrinter()">prueba</button>
 
       <paper-card>
         <div class="card-content">
@@ -147,7 +146,16 @@ limitations under the License.
             console.log(imagenContainer);
             var imghtml = `<img src="data:image/jpeg;base64,${base64Image.slice(1, -1)}" style="  transform: rotate(90deg); width: 200px;margin-top: 80px;"> `;
             imagenContainer.innerHTML = imghtml;
-          
+//prueba
+            let canvas = document.createElement('canvas');
+            var img = new Image();
+            img.src = "data:image/png;base64," + base64Image.slice(1, -1);
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            imagenContainer.appendChild(canvas);
+//prueba          
           })
           .catch((error) => {
             console.log(error);
@@ -306,26 +314,6 @@ limitations under the License.
           }
         });
       });
-//prueba
-      async function connectToBluetoothPrinter() {
-  try {
-    const device = await navigator.bluetooth.requestDevice({ filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }] });
-    const server = await device.gatt.connect();
-    const service = await server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb");
-    const characteristic = await service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb");
-    
-    // Enviar datos a la impresora (depende del protocolo y formato necesario)
-    await characteristic.writeValue("prueba");
-    
-    console.log('Datos enviados a la impresora exitosamente.');
-  } catch (error) {
-    console.error('Error:', error);
-  }
-}
-
-// prueba
-
-
     </script>
   </body>
 </html>
