@@ -159,23 +159,24 @@ limitations under the License.
             console.log('No image to print!');
             return new Uint8Array([]);
           }
+          var bits = 16;//cambio de 8 a 16
           // Each 8 pixels in a row is represented by a byte
-          let printData = new Uint8Array(canvas.width / 8 * canvas.height + 8);
+          let printData = new Uint8Array(canvas.width / bits * canvas.height + bits);
           let offset = 0;
           // Set the header bytes for printing the image
           printData[0] = 29;  // Print raster bitmap
           printData[1] = 118; // Print raster bitmap
           printData[2] = 48; // Print raster bitmap
           printData[3] = 0;  // Normal 203.2 DPI
-          printData[4] = canvas.width / 8; // Number of horizontal data bits (LSB)
+          printData[4] = canvas.width / bits; // Number of horizontal data bits (LSB)
           printData[5] = 0; // Number of horizontal data bits (MSB)
           printData[6] = canvas.height % 256; // Number of vertical data bits (LSB)
           printData[7] = canvas.height / 256;  // Number of vertical data bits (MSB)
           offset = 7;
           // Loop through image rows in bytes
           for (let i = 0; i < canvas.height; ++i) {
-            for (let k = 0; k < canvas.width / 8; ++k) {
-              let k8 = k * 8;
+            for (let k = 0; k < canvas.width / bits; ++k) {
+              let k8 = k * bits;
               //  Pixel to bit position mapping
               printData[++offset] = getDarkPixel(k8 + 0, i) * 128 + getDarkPixel(k8 + 1, i) * 64 +
                           getDarkPixel(k8 + 2, i) * 32 + getDarkPixel(k8 + 3, i) * 16 +
