@@ -171,7 +171,7 @@ limitations under the License.
           printData[5] = 0; // Number of horizontal data bits (MSB)
           printData[6] = canvas.height % 256; // Number of vertical data bits (LSB)
           printData[7] = canvas.height / 256;  // Number of vertical data bits (MSB)
-          offset = 0;//7deafult
+          offset = 16;//7deafult
           // Loop through image rows in bytes
           for (let i = 0; i < canvas.height; ++i) {
             for (let k = 0; k < canvas.width / 8; ++k) {
