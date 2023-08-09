@@ -159,7 +159,7 @@ limitations under the License.
             console.log('No image to print!');
             return new Uint8Array([]);
           }
-          var bits = 16;//cambio de 8 a 16
+          var bits = 4;//cambio de 8 a 16
           // Each 8 pixels in a row is represented by a byte
           let printData = new Uint8Array(canvas.width / bits * canvas.height + bits);
           let offset = 0;
