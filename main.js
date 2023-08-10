@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const URLPlugin = "http://localhost:8000"; // Si el plugin no está en local, coloca la IP. Por ejemplo 192.168.1.76:8000
+    const URLPlugin = "https://marcos-castillo.github.io/notificacion_Push/"; // Si el plugin no está en local, coloca la IP. Por ejemplo 192.168.1.76:8000
 
     const $btnImprimir = document.querySelector("#btnImprimir"),
         $licencia = document.querySelector("#licencia"),
