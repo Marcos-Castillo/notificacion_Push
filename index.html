@@ -21,7 +21,7 @@
     <div class="card-body">
       <div class="form-group">
         <label for="message">Enter Message:</label>
-        <input type="text" class="form-control" id="message">
+        <input type="text" class="form-control" id="message" value="pimpo">
       </div>
       <button class="btn btn-primary" id="print">Print</button>
     </div>
@@ -37,10 +37,27 @@
       // Get the text from the input field
       let textToPrint = messageInput.value;
 
-      // Perform the printing logic here
-      // This is where you would connect to Bluetooth and send the data to the printer
+      // Request Bluetooth device
+      navigator.bluetooth.requestDevice({
+        filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }]
+      })
+      .then(device => device.gatt.connect())
+      .then(server => server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb"))
+      .then(service => service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb"))
+      .then(characteristic => {
+        // Convert text to bytes
+        let encoder = new TextEncoder('utf-8');
+        let data = encoder.encode(textToPrint);
 
-      console.log('Printing: ' + textToPrint);
+        // Write data to the characteristic
+        return characteristic.writeValue(data);
+      })
+      .then(() => {
+        console.log('Printed successfully: ' + textToPrint);
+      })
+      .catch(error => {
+        console.error('Error printing:', error);
+      });
     });
   });
 </script>
