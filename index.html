@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <title>Bluetooth Printer</title>
   <meta name="description" content="Print text and images to a Bluetooth Printer with a Web Bluetooth app.">
@@ -9,6 +10,7 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
+
 <body>
   <div class="container mt-4">
     <div class="card">
@@ -27,7 +29,8 @@
 
     <div class="card mt-4">
       <div class="card-body">
-        <textarea id="message" class="form-control" rows="3" placeholder="Enter Message"></textarea>
+        <textarea id="message" class="form-control" rows="3" placeholder="Enter Message" style="display: none;"></textarea>
+        <input type="file" id="imageInput" accept="image/*" style="display: none;" />
       </div>
     </div>
 
@@ -57,7 +60,7 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       let progress = document.querySelector('.progress');
       let dialog = document.querySelector('#dialog');
       let message = document.querySelector('#message');
@@ -74,50 +77,75 @@
         dialog.open();
       }
 
-      function sendTextData() {
-        // Get the bytes for the text
+      function sendHTMLData() {
+        let htmlText = '<html><body><h1>' + message.value + '</h1></body></html>';
         let encoder = new TextEncoder("utf-8");
-        // Add line feed + carriage return chars to text
-        let text = encoder.encode(message.value + '\u000A\u000D');
-        return printCharacteristic.writeValue(text).then(() => {
-          console.log('Write done.');
+        let htmlData = encoder.encode(htmlText);
+        return printCharacteristic.writeValue(htmlData).then(() => {
+          console.log('HTML Write done.');
         });
       }
 
-      function sendPrinterData() {
-        sendTextData()
-        .then(() => {
+      function sendImageData() {
+        let imageInput = document.querySelector('#imageInput');
+        let imageFile = imageInput.files[0];
+        if (imageFile) {
+          let reader = new FileReader();
+          reader.onload = function (event) {
+            let imageData = new Uint8Array(event.target.result);
+            printCharacteristic.writeValue(imageData).then(() => {
+              console.log('Image Write done.');
+              progress.hidden = true;
+            }).catch(handleError);
+          };
+          reader.readAsArrayBuffer(imageFile);
+        } else {
           progress.hidden = true;
-        })
-        .catch(handleError);
+        }
+      }
+
+      function sendPrinterData() {
+        sendHTMLData()
+          .then(() => {
+            progress.hidden = true;
+          })
+          .catch(handleError);
       }
 
       printButton.addEventListener('click', function () {
         progress.hidden = false;
         if (printCharacteristic == null) {
           navigator.bluetooth.requestDevice({
-            filters: [{
-              services: ['000018f0-0000-1000-8000-00805f9b34fb']
-            }]
-          })
-          .then(device => {
-            console.log('> Found ' + device.name);
-            console.log('Connecting to GATT Server...');
-            return device.gatt.connect();
-          })
-          .then(server => server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb"))
-          .then(service => service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb"))
-          .then(characteristic => {
-            // Cache the characteristic
-            printCharacteristic = characteristic;
-            sendPrinterData();
-          })
-          .catch(handleError);
+              filters: [{
+                services: ['000018f0-0000-1000-8000-00805f9b34fb']
+              }]
+            })
+            .then(device => {
+              console.log('> Found ' + device.name);
+              console.log('Connecting to GATT Server...');
+              return device.gatt.connect();
+            })
+            .then(server => server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb"))
+            .then(service => service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb"))
+            .then(characteristic => {
+              // Cache the characteristic
+              printCharacteristic = characteristic;
+              sendPrinterData();
+            })
+            .catch(handleError);
         } else {
-          sendPrinterData();
+          // Choose whether to send HTML or Image data based on user input
+          let imageInput = document.querySelector('#imageInput');
+          if (imageInput.files.length > 0) {
+            sendImageData();
+          } else {
+            sendHTMLData();
+          }
         }
       });
     });
   </script>
 </body>
+
 </html>
+
