@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <title>Bluetooth Printer</title>
-  <meta name="description" content="Print text and images to a Bluetooth Printer with a Web Bluetooth app.">
+  <meta name="description" content="Print text to a Bluetooth Printer with a Web Bluetooth app.">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -21,27 +21,13 @@
 
     <div class="card mt-4">
       <div class="card-body">
-        <img src="logo-black.png" alt="Logo" class="img-fluid mx-auto d-block">
-      </div>
-    </div>
-
-    <div class="card mt-4">
-      <div class="card-body">
         <textarea id="message" class="form-control" rows="3" placeholder="Enter Message"></textarea>
-      </div>
-    </div>
-
-    <div class="card mt-4">
-      <div class="card-body">
-        <label for="imageInput" class="form-label">Select an image to print:</label>
-        <input type="file" id="imageInput" accept="image/*" class="form-control">
       </div>
     </div>
 
     <div class="card mt-4">
       <div class="card-body text-center">
         <button id="printText" class="btn btn-primary">Print Text</button>
-        <button id="printImage" class="btn btn-primary ml-2">Print Image</button>
       </div>
     </div>
 
@@ -69,12 +55,9 @@
       let progress = document.querySelector('.progress');
       let dialog = document.querySelector('#dialog');
       let message = document.querySelector('#message');
-      let imageInput = document.querySelector('#imageInput');
       let printTextButton = document.querySelector('#printText');
-      let printImageButton = document.querySelector('#printImage');
       let printCharacteristic;
-      let index = 0;
-      let data;
+
       progress.hidden = true;
 
       function handleError(error) {
@@ -94,32 +77,12 @@
         });
       }
 
-      function sendImageData() {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-
-          reader.onload = function(event) {
-            const imageData = new Uint8Array(event.target.result);
-            printCharacteristic.writeValue(imageData).then(() => {
-              console.log('Image Write done.');
-              resolve();
-            }).catch(reject);
-          };
-
-          reader.onerror = function(event) {
-            reject(event.error);
-          };
-
-          reader.readAsArrayBuffer(imageInput.files[0]);
-        });
-      }
-
-      function sendPrinterData(sendDataFunc) {
-        sendDataFunc()
-        .then(() => {
-          progress.hidden = true;
-        })
-        .catch(handleError);
+      function sendPrinterData() {
+        sendTextData()
+          .then(() => {
+            progress.hidden = true;
+          })
+          .catch(handleError);
       }
 
       printTextButton.addEventListener('click', function () {
@@ -130,47 +93,21 @@
               services: ['000018f0-0000-1000-8000-00805f9b34fb']
             }]
           })
-          .then(device => {
-            console.log('> Found ' + device.name);
-            console.log('Connecting to GATT Server...');
-            return device.gatt.connect();
-          })
-          .then(server => server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb"))
-          .then(service => service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb"))
-          .then(characteristic => {
-            // Cache the characteristic
-            printCharacteristic = characteristic;
-            sendPrinterData(sendTextData);
-          })
-          .catch(handleError);
+            .then(device => {
+              console.log('> Found ' + device.name);
+              console.log('Connecting to GATT Server...');
+              return device.gatt.connect();
+            })
+            .then(server => server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb"))
+            .then(service => service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb"))
+            .then(characteristic => {
+              // Cache the characteristic
+              printCharacteristic = characteristic;
+              sendPrinterData();
+            })
+            .catch(handleError);
         } else {
-          sendPrinterData(sendTextData);
-        }
-      });
-
-      printImageButton.addEventListener('click', function () {
-        progress.hidden = false;
-        if (printCharacteristic == null) {
-          navigator.bluetooth.requestDevice({
-            filters: [{
-              services: ['000018f0-0000-1000-8000-00805f9b34fb']
-            }]
-          })
-          .then(device => {
-            console.log('> Found ' + device.name);
-            console.log('Connecting to GATT Server...');
-            return device.gatt.connect();
-          })
-          .then(server => server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb"))
-          .then(service => service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb"))
-          .then(characteristic => {
-            // Cache the characteristic
-            printCharacteristic = characteristic;
-            sendPrinterData(sendImageData);
-          })
-          .catch(handleError);
-        } else {
-          sendPrinterData(sendImageData);
+          sendPrinterData();
         }
       });
     });
