@@ -3,21 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Imprimir Imagen por Bluetooth</title>
+  <title>Imprimir por Bluetooth</title>
   <!-- Agrega el enlace a Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body class="container mt-5">
   <div class="mb-3">
-    <label for="fileInput" class="form-label">Selecciona una imagen para imprimir:</label>
-    <input type="file" class="form-control" id="fileInput" accept="image/*">
+    <h2>Imprimir Imagen</h2>
+    <label for="imageInput" class="form-label">Selecciona una imagen para imprimir:</label>
+    <input type="file" class="form-control" id="imageInput" accept="image/*">
+    <button onclick="sendImageToPrint()" class="btn btn-primary mt-2">Imprimir Imagen por Bluetooth</button>
   </div>
-  <button onclick="sendImageToPrint()" class="btn btn-primary">Imprimir Imagen por Bluetooth</button>
+
+  <hr>
+
+  <div class="mb-3">
+    <h2>Imprimir Texto</h2>
+    <label for="textInput" class="form-label">Ingresa el texto a imprimir:</label>
+    <input type="text" class="form-control" id="textInput" placeholder="Texto a imprimir">
+    <button onclick="sendTextToPrint()" class="btn btn-primary mt-2">Imprimir Texto por Bluetooth</button>
+  </div>
 
   <script>
     async function sendImageToPrint() {
-      const fileInput = document.getElementById('fileInput');
-      const imageFile = fileInput.files[0];
+      const imageInput = document.getElementById('imageInput');
+      const imageFile = imageInput.files[0];
 
       if (imageFile) {
         try {
@@ -41,6 +51,35 @@
         }
       } else {
         console.error('No se ha seleccionado ninguna imagen.');
+      }
+    }
+
+    async function sendTextToPrint() {
+      const textInput = document.getElementById('textInput');
+      const textToPrint = textInput.value;
+
+      if (textToPrint) {
+        try {
+          const serviceUuid = '00001101-0000-1000-8000-00805F9B34FB'; // UUID genérico de impresoras Bluetooth
+          const characteristicUuid = '00001101-0000-1000-8000-00805F9B34FB'; // UUID genérico de impresoras Bluetooth
+
+          const device = await navigator.bluetooth.requestDevice({
+            filters: [{ services: [serviceUuid] }],
+          });
+
+          const server = await device.gatt.connect();
+          const service = await server.getPrimaryService(serviceUuid);
+          const characteristic = await service.getCharacteristic(characteristicUuid);
+
+          const encoder = new TextEncoder('utf-8');
+          await characteristic.writeValue(encoder.encode(textToPrint));
+
+          console.log('Texto enviado correctamente.');
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      } else {
+        console.error('No se ha ingresado ningún texto.');
       }
     }
   </script>
