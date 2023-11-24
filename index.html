@@ -89,11 +89,18 @@
       function sendImageData() {
         const fileInput = imageInput.files[0];
         if (fileInput) {
+          // ************ Agregar marcador antes de la imagen ************
+          alert('************ Inicio de la imagen ************');
+
           const reader = new FileReader();
           reader.onload = function(event) {
             const imageData = new Uint8Array(event.target.result);
+            
+            // ************ Agregar marcador después de la imagen ************
+            alert('************ Fin de la imagen ************');
+
             printCharacteristic.writeValue(imageData).then(() => {
-              console.log('Image Write done.');
+              alert('Image Write done.');
             });
           };
           reader.readAsArrayBuffer(fileInput);
