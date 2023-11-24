@@ -11,29 +11,24 @@
 </head>
 <body>
   <div class="container mt-4">
-    <div class="card">
-      <div class="card-body">
-        <div class="progress" style="width: 100%;">
-          <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
-        </div>
-      </div>
-    </div>
 
     <div class="card mt-4">
       <div class="card-body">
-        <img src="logo-black.png" alt="Logo" class="img-fluid mx-auto d-block">
+        <h2>Imprimir Imagen</h2>
+        <label for="imageInput" class="form-label">Selecciona una imagen para imprimir:</label>
+        <input type="file" class="form-control" id="imageInput" accept="image/*">
+        <button onclick="sendImageToPrint()" class="btn btn-primary mt-2">Imprimir Imagen por Bluetooth</button>
       </div>
     </div>
+
+    <hr>
 
     <div class="card mt-4">
       <div class="card-body">
-        <textarea id="message" class="form-control" rows="3" placeholder="Enter Message"></textarea>
-      </div>
-    </div>
-
-    <div class="card mt-4">
-      <div class="card-body text-center">
-        <button id="print" class="btn btn-primary">Print</button>
+        <h2>Imprimir Texto</h2>
+        <label for="textInput" class="form-label">Ingresa el texto a imprimir:</label>
+        <input type="text" class="form-control" id="textInput" placeholder="Texto a imprimir">
+        <button onclick="sendTextToPrint()" class="btn btn-primary mt-2">Imprimir Texto por Bluetooth</button>
       </div>
     </div>
 
@@ -60,41 +55,50 @@
     document.addEventListener('DOMContentLoaded', function() {
       let progress = document.querySelector('.progress');
       let dialog = document.querySelector('#dialog');
-      let message = document.querySelector('#message');
-      let printButton = document.querySelector('#print');
-      let printCharacteristic;
-      let index = 0;
-      let data;
+      let imageInput = document.querySelector('#imageInput');
+      let textInput = document.querySelector('#textInput');
+      let imageCharacteristic;
+      let textCharacteristic;
       progress.hidden = true;
 
       function handleError(error) {
         console.log(error);
         progress.hidden = true;
-        printCharacteristic = null;
+        imageCharacteristic = null;
+        textCharacteristic = null;
         dialog.open();
       }
 
+      function sendImageData() {
+        let imageFile = imageInput.files[0];
+        if (imageFile) {
+          let imageArrayBuffer = imageFile.arrayBuffer();
+          return imageCharacteristic.writeValue(imageArrayBuffer).then(() => {
+            console.log('Imagen enviada correctamente.');
+          });
+        } else {
+          console.error('No se ha seleccionado ninguna imagen.');
+          return Promise.reject('No se ha seleccionado ninguna imagen.');
+        }
+      }
+
       function sendTextData() {
-        // Get the bytes for the text
-        let encoder = new TextEncoder("utf-8");
-        // Add line feed + carriage return chars to text
-        let text = encoder.encode(message.value + '\u000A\u000D');
-        return printCharacteristic.writeValue(text).then(() => {
-          console.log('Write done.');
-        });
+        let textToPrint = textInput.value;
+        if (textToPrint) {
+          let encoder = new TextEncoder('utf-8');
+          let textArrayBuffer = encoder.encode(textToPrint + '\u000A\u000D');
+          return textCharacteristic.writeValue(textArrayBuffer).then(() => {
+            console.log('Texto enviado correctamente.');
+          });
+        } else {
+          console.error('No se ha ingresado ningún texto.');
+          return Promise.reject('No se ha ingresado ningún texto.');
+        }
       }
 
-      function sendPrinterData() {
-        sendTextData()
-        .then(() => {
-          progress.hidden = true;
-        })
-        .catch(handleError);
-      }
-
-      printButton.addEventListener('click', function () {
+      function sendImageToPrint() {
         progress.hidden = false;
-        if (printCharacteristic == null) {
+        if (imageCharacteristic == null) {
           navigator.bluetooth.requestDevice({
             filters: [{
               services: ['000018f0-0000-1000-8000-00805f9b34fb']
@@ -109,14 +113,55 @@
           .then(service => service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb"))
           .then(characteristic => {
             // Cache the characteristic
-            printCharacteristic = characteristic;
-            sendPrinterData();
+            imageCharacteristic = characteristic;
+            return sendImageData();
+          })
+          .then(() => {
+            progress.hidden = true;
           })
           .catch(handleError);
         } else {
-          sendPrinterData();
+          sendImageData()
+          .then(() => {
+            progress.hidden = true;
+          })
+          .catch(handleError);
         }
-      });
+      }
+
+      function sendTextToPrint() {
+        progress.hidden = false;
+        if (textCharacteristic == null) {
+          navigator.bluetooth.requestDevice({
+            filters: [{
+              services: ['000018f0-0000-1000-8000-00805f9b34fb']
+            }]
+          })
+          .then(device => {
+            console.log('> Found ' + device.name);
+            console.log('Connecting to GATT Server...');
+            return device.gatt.connect();
+          })
+          .then(server => server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb"))
+          .then(service => service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb"))
+          .then(characteristic => {
+            // Cache the characteristic
+            textCharacteristic = characteristic;
+            return sendTextData();
+          })
+          .then(() => {
+            progress.hidden = true;
+          })
+          .catch(handleError);
+        } else {
+          sendTextData()
+          .then(() => {
+            progress.hidden = true;
+          })
+          .catch(handleError);
+        }
+      }
+
     });
   </script>
 </body>
