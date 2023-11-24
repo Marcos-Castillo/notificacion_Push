@@ -91,8 +91,8 @@
         if (fileInput) {
           const reader = new FileReader();
           reader.onload = function(event) {
-            const imageArrayBuffer = event.target.result;
-            printCharacteristic.writeValue(imageArrayBuffer).then(() => {
+            const imageData = new Uint8Array(event.target.result);
+            printCharacteristic.writeValue(imageData).then(() => {
               console.log('Image Write done.');
             });
           };
