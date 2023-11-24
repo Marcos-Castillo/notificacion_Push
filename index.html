@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <title>Bluetooth Printer</title>
-  <meta name="description" content="Print text to a Bluetooth Printer with a Web Bluetooth app.">
+  <meta name="description" content="Print text and images to a Bluetooth Printer with a Web Bluetooth app.">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -26,8 +26,15 @@
     </div>
 
     <div class="card mt-4">
+      <div class="card-body">
+        <input type="file" id="imageInput" accept="image/*" class="form-control">
+      </div>
+    </div>
+
+    <div class="card mt-4">
       <div class="card-body text-center">
         <button id="printText" class="btn btn-primary">Print Text</button>
+        <button id="printImage" class="btn btn-primary ml-2">Print Image</button>
       </div>
     </div>
 
@@ -55,7 +62,9 @@
       let progress = document.querySelector('.progress');
       let dialog = document.querySelector('#dialog');
       let message = document.querySelector('#message');
+      let imageInput = document.querySelector('#imageInput');
       let printTextButton = document.querySelector('#printText');
+      let printImageButton = document.querySelector('#printImage');
       let printCharacteristic;
 
       progress.hidden = true;
@@ -77,12 +86,23 @@
         });
       }
 
-      function sendPrinterData() {
-        sendTextData()
-          .then(() => {
-            progress.hidden = true;
-          })
-          .catch(handleError);
+      function sendImageData() {
+        const fileInput = imageInput.files[0];
+        if (fileInput) {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            const imageArrayBuffer = event.target.result;
+            printCharacteristic.writeValue(imageArrayBuffer).then(() => {
+              console.log('Image Write done.');
+            });
+          };
+          reader.readAsArrayBuffer(fileInput);
+        }
+      }
+
+      function sendPrinterData(callback) {
+        callback(); // Either sendTextData or sendImageData
+        progress.hidden = true;
       }
 
       printTextButton.addEventListener('click', function () {
@@ -103,11 +123,37 @@
             .then(characteristic => {
               // Cache the characteristic
               printCharacteristic = characteristic;
-              sendPrinterData();
+              sendPrinterData(sendTextData);
             })
             .catch(handleError);
         } else {
-          sendPrinterData();
+          sendPrinterData(sendTextData);
+        }
+      });
+
+      printImageButton.addEventListener('click', function () {
+        progress.hidden = false;
+        if (printCharacteristic == null) {
+          navigator.bluetooth.requestDevice({
+            filters: [{
+              services: ['000018f0-0000-1000-8000-00805f9b34fb']
+            }]
+          })
+            .then(device => {
+              console.log('> Found ' + device.name);
+              console.log('Connecting to GATT Server...');
+              return device.gatt.connect();
+            })
+            .then(server => server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb"))
+            .then(service => service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb"))
+            .then(characteristic => {
+              // Cache the characteristic
+              printCharacteristic = characteristic;
+              sendPrinterData(sendImageData);
+            })
+            .catch(handleError);
+        } else {
+          sendPrinterData(sendImageData);
         }
       });
     });
