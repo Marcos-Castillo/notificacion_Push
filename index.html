@@ -87,25 +87,25 @@
       }
 
       function sendImageData() {
-        const fileInput = imageInput.files[0];
-        if (fileInput) {
-          // ************ Agregar marcador antes de la imagen ************
-          alert('************ Inicio de la imagen ************');
+  const fileInput = imageInput.files[0];
+  if (fileInput) {
+    const reader = new FileReader();
+    
+    // Definir la función de manejo de carga antes de llamar a readAsArrayBuffer
+    reader.onload = function(event) {
+      const imageData = new Uint8Array(event.target.result);
+      
+      // Ahora, puedes enviar imageData después de leer el archivo
+      printCharacteristic.writeValue(imageData).then(() => {
+        alert('Image Write done.');
+      });
+    };
+    
+    // Llamar a readAsArrayBuffer después de definir la función onload
+    reader.readAsArrayBuffer(fileInput);
+  }
+}
 
-          const reader = new FileReader();
-          reader.onload = function(event) {
-            const imageData = new Uint8Array(event.target.result);
-            
-            // ************ Agregar marcador después de la imagen ************
-            alert('************ Fin de la imagen ************');
-
-            printCharacteristic.writeValue(imageData).then(() => {
-              alert('Image Write done.');
-            });
-          };
-          reader.readAsArrayBuffer(fileInput);
-        }
-      }
 
       function sendPrinterData(callback) {
         callback(); // Either sendTextData or sendImageData
