@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const conector = new ConectorEscposAndroid(licencia, URLPlugin);
         conector
             .Iniciar()
-            .EstablecerFuente(16)
+            
             .EstablecerAlineacion(ConectorEscposAndroid.ALINEACION_CENTRO)
             .DescargarImagenDeInternetEImprimir("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnCFM8VHvuN8HpwQEpN0qdz98Chw-NLxmMuXqcs9EOSOZoeHdBnywlsfUX0o7eHxCS9h0&usqp=CAU", 0, 216)
             .Iniciar() // En mi impresora debo invocar a "Iniciar" después de imprimir una imagen
@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             .EscribirTexto("Grupo Dinosaurio\n")
             .Feed(8)
             .Corte(8)
-            .EstablecerFuente(4)
+            .EstablecerTamañoFuente(.1,.1)
             .Pulso(48, 60, 120)
 
         try {
