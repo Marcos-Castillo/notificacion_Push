@@ -50,11 +50,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             .Iniciar()
             .EstablecerAlineacion(ConectorEscposAndroid.ALINEACION_CENTRO)
             .Feed(1)
-            .EstablecerTamañoFuente(1, 1)
+            .EstablecerTamañoFuente(2, 2)
             .EscribirTexto("Grupo Dinosaurio\n")
             .Feed(8)
             .Corte(8)
-            .EstablecerTamañoFuente(.1,.1)
+            .EstablecerTamañoFuente(0,0)
             .Pulso(48, 60, 120)
 
         try {
