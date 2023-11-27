@@ -53,10 +53,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             .EstablecerTamañoFuente(2, 2)
             .EscribirTexto("Grupo Dinosaurio\n")
             .Feed(8)
-            .Corte(8)
-            .EstablecerTamañoFuente(8,8)
+            .Corte(5)
+            .EstablecerFuente(1)
+            .EscribirTexto("Grupo Dinosaurio\n")
+            .Corte(5)
+            .EstablecerFuente(0)
             .Pulso(48, 60, 120)
-
+            .Pulso(0,0,0)
         try {
             const respuesta = await conector.imprimirEn(macImpresora);
             if (respuesta === true) {
