@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             .Corte(5)
             .EstablecerFuente(0)
             .Pulso(48, 60, 120)
-            .Pulso(0,0,0)
+            
         try {
             const respuesta = await conector.imprimirEn(macImpresora);
             if (respuesta === true) {
