@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             .EscribirTexto("Grupo Dinosaurio\n")
             .Feed(8)
             .Corte(8)
-            .EstablecerTamañoFuente(0,0)
+            .EstablecerTamañoFuente(8,8)
             .Pulso(48, 60, 120)
 
         try {
