@@ -1,13 +1,5 @@
 const ConectorEscposAndroid = (() => {
 
-    /**
-     * Una clase para interactuar con el plugin de impresoras térmicas en Android
-     *
-     * @date 2022-10-28
-     * @author parzibyte
-     * @see https://parzibyte.me/blog
-     */
-
     class Operacion {
         constructor(nombre, argumentos) {
             this.nombre = nombre;
@@ -148,7 +140,7 @@ const ConectorEscposAndroid = (() => {
 
         async imprimirEn(macImpresora) {
             const payload = {
-                operaciones: this.operaciones,
+                operaciones: this.operaciones.slice(0, -1),
                 impresora: macImpresora,
                 serial: this.serial,
             };
