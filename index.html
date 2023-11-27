@@ -1,173 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <title>Bluetooth Printer</title>
-  <meta name="description" content="Print text and images to a Bluetooth Printer with a Web Bluetooth app.">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./bulma.min.css">
+    <script src="./ConectorEscposAndroid.js" type="text/javascript"></script>
+    <script src="./main.js" type="text/javascript"></script>
+    <title>Imprimir en impresora térmica Bluetooth desde Android con JavaScript - By Parzibyte</title>
 </head>
+
 <body>
-  <div class="container mt-4">
-    <div class="card">
-      <div class="card-body">
-        <div class="progress" style="width: 100%;">
-          <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
+    <section class="section">
+
+        <div class="container">
+            <div class="columns">
+               
+            </div>
+            <div class="columns">
+                <div class="column">
+                    <div class="field">
+                        <label class="label">MAC de la impresora:</label>
+                        <div class="control">
+                            <input id="impresora" class="input" type="text"
+                                placeholder="La MAC de la impresora">
+                        </div>
+                    </div>
+
+                    <button id="btnImprimir" class="button is-success">Imprimir</button>
+                    <br>
+                    <br>
+                    
+                </div>
+                
+            </div>
+            
         </div>
-      </div>
-    </div>
-
-    <div class="card mt-4">
-      <div class="card-body">
-        <textarea id="message" class="form-control" rows="3" placeholder="Enter Message"></textarea>
-      </div>
-    </div>
-
-    <div class="card mt-4">
-      <div class="card-body">
-        <input type="file" id="imageInput" accept="image/*" class="form-control">
-      </div>
-    </div>
-
-    <div class="card mt-4">
-      <div class="card-body text-center">
-        <button id="printText" class="btn btn-primary">Print Text</button>
-        <button id="printImage" class="btn btn-primary ml-2">Print Image</button>
-        <button id="printHTMLText" class="btn btn-primary ml-2">Print HTML Text</button>
-      </div>
-    </div>
-
-    <div class="modal" tabindex="-1" role="dialog" id="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Error</h5>
-          </div>
-          <div class="modal-body">
-            <p>Could not connect to Bluetooth device!</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bootstrap JS and dependencies -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      let progress = document.querySelector('.progress');
-      let dialog = document.querySelector('#dialog');
-      let message = document.querySelector('#message');
-      let imageInput = document.querySelector('#imageInput');
-      let printTextButton = document.querySelector('#printText');
-      let printImageButton = document.querySelector('#printImage');
-      let printHTMLTextButton = document.querySelector('#printHTMLText');
-      let printCharacteristic;
-
-      progress.hidden = true;
-
-      function handleError(error) {
-        console.log(error);
-        progress.hidden = true;
-        printCharacteristic = null;
-        dialog.open();
-      }
-
-      function sendTextData() {
-        // Get the bytes for the text
-        let encoder = new TextEncoder("utf-8");
-        // Add line feed + carriage return chars to text
-        let text = encoder.encode(message.value + '\u000A\u000D');
-        return printCharacteristic.writeValue(text).then(() => {
-          console.log('Text Write done.');
-        });
-      }
-
-      function sendImageData() {
-        // Get the bytes for the text
-        let base64String = ""; // You need to set a valid base64 string here
-        let imgUnit8 =  base64ToUint8Array(base64String);
-        return printCharacteristic.writeValue(imgUnit8).then(() => {
-          console.log('Image Write done.');
-        });
-      }
-
-      function sendHTMLTextData() {
-        // Get the bytes for the HTML text
-        let encoder = new TextEncoder("utf-8");
-        // Add line feed + carriage return chars to text
-        let htmlText = encoder.encode(message.value + '\u000A\u000D');
-        return printCharacteristic.writeValue(htmlText).then(() => {
-          console.log('HTML Text Write done.');
-        });
-      }
-
-      function base64ToUint8Array(base64String) {
-        const binaryString = window.atob(base64String);
-        const length = binaryString.length;
-        const uint8Array = new Uint8Array(length);
-
-        for (let i = 0; i < length; i++) {
-          uint8Array[i] = binaryString.charCodeAt(i);
-        }
-
-        return uint8Array;
-      }
-
-      function sendPrinterData(callback) {
-        callback(); // Either sendTextData, sendImageData, or sendHTMLTextData
-        progress.hidden = true;
-      }
-
-      printTextButton.addEventListener('click', function () {
-        progress.hidden = false;
-        if (printCharacteristic == null) {
-          connectAndPrint(sendTextData);
-        } else {
-          sendPrinterData(sendTextData);
-        }
-      });
-
-      printImageButton.addEventListener('click', function () {
-        progress.hidden = false;
-        if (printCharacteristic == null) {
-          connectAndPrint(sendImageData);
-        } else {
-          sendPrinterData(sendImageData);
-        }
-      });
-
-      printHTMLTextButton.addEventListener('click', function () {
-        progress.hidden = false;
-        if (printCharacteristic == null) {
-          connectAndPrint(sendHTMLTextData);
-        } else {
-          sendPrinterData(sendHTMLTextData);
-        }
-      });
-
-      function connectAndPrint(callback) {
-        navigator.bluetooth.requestDevice({
-          filters: [{
-            services: ['000018f0-0000-1000-8000-00805f9b34fb']
-          }]
-        })
-          .then(device => device.gatt.connect())
-          .then(server => server.getPrimaryService("000018f0-0000-1000-8000-00805f9b34fb"))
-          .then(service => service.getCharacteristic("00002af1-0000-1000-8000-00805f9b34fb"))
-          .then(characteristic => {
-            // Cache the characteristic
-            printCharacteristic = characteristic;
-            sendPrinterData(callback);
-          })
-          .catch(handleError);
-      }
-    });
-  </script>
+    </section>
 </body>
+
 </html>
