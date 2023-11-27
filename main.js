@@ -21,8 +21,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             .EstablecerAlineacion(ConectorEscposAndroid.ALINEACION_CENTRO)
             .DescargarImagenDeInternetEImprimir("https://www.dinosauriorrhh.com.ar/clubdino/asset/img/pencil.png", 0, 216)
             .Iniciar() // En mi impresora debo invocar a "Iniciar" después de imprimir una imagen
-            .CargarImagenLocalEImprimir("./Logo-GD-V4-Negro.png", 0, 216)
-            .Iniciar() // En mi impresora debo invocar a "Iniciar" después de imprimir una imagen
             .EstablecerAlineacion(ConectorEscposAndroid.ALINEACION_CENTRO)
             .Feed(1)
             .EscribirTexto("talanga blog\n")
