@@ -10,7 +10,11 @@
     <script src="./main.js" type="text/javascript"></script>
     <title>Imprimir en impresora térmica Bluetooth desde Android con JavaScript - By Parzibyte</title>
 </head>
-
+<style>
+  .d-none{
+    display: none;
+  }
+</style>
 <body>
     <section class="section">
 
@@ -18,7 +22,7 @@
             <div class="columns">
                 <div class="column">
                     <h1 class="is-size-1">Plugin!</h1>
-                    <div class="notification is-info">
+                    <div class="notification is-info d-none">
                         <ol>
                             <li>Asegúrate de que estás visitando esta página desde el dispositivo donde se está
                                 ejecutando
@@ -80,7 +84,7 @@
                         correcta. Básicamente la petición ha fallado por algún problema de conexión en la red
                     </div>
                 </div>
-                <div class="column">
+                <div class="column d-none">
                     <div class="notification is-warning">
                         <p>
                             Al imprimir, el resultado debería ser parecido al siguiente:
@@ -90,8 +94,8 @@
                         alt="Resultado de impresión de ticket con plugin para imprimir en impresora térmica con Android desde JS">
                 </div>
             </div>
-            <div class="columns has-text-centered">
-                <div class="column">
+            <div class="columns has-text-centered d-none">
+                <div class="column d-none">
                     <p>
                         <a href="https://parzibyte.me/blog">Proudly brought to you by Parzibyte</a>
                     </p>
